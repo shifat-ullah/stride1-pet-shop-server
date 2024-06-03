@@ -32,8 +32,21 @@ async function run() {
 
     const petCollection = client.db('petShop').collection('pets')
 
-// 
+// post featured data
+app.post('/pets', async(req,res)=>{
+    const formData = req.body;
+    const result = await petCollection.insertOne(formData)
+    // console.log(result);
+    res.send(result)
+})
 
+
+// get feature data
+app.get('/pets', async(req,res)=>{
+    const result= await petCollection.find().toArray();
+    console.log(result);
+    res.send(result)
+})
 
 
     // Send a ping to confirm a successful connection
