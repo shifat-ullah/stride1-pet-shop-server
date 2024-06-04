@@ -42,6 +42,29 @@ app.post('/pets', async(req,res)=>{
 })
 
 
+// search filtering data
+const indexKey={title:1, category:1}
+const indexOptions = {name : "titleCategory"}
+const result = petCollection.createIndex(indexKey, indexOptions);
+console.log(result)
+
+app.get('/pets/:text', async (req, res) => {
+  const text = req.params.text;
+  const result = await petCollection
+    .find({
+      $or: [
+        { title: { $regex: text, $options: "i" } },
+        { category: { $regex: text, $options: "i" } },
+      ],
+    })
+    .toArray();
+    console.log({result})
+  res.send(result);
+  
+  
+});
+
+
 // get feature data
 app.get('/pets', async(req,res)=>{
     const result= await petCollection.find().toArray();
@@ -120,6 +143,12 @@ app.patch('/user/:email', async(req,res)=>{
   res.send(result)
     
 })
+
+
+
+
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
