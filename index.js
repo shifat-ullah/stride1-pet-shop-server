@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const jwt = require('jsonwebtoken');
+
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
@@ -51,7 +52,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
 
     const petCollection = client.db('petShop').collection('pets')
