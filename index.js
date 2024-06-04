@@ -31,6 +31,7 @@ async function run() {
 
 
     const petCollection = client.db('petShop').collection('pets')
+    const userCollection = client.db('petShop').collection('users')
 
 // post featured data
 app.post('/pets', async(req,res)=>{
@@ -56,14 +57,69 @@ app.delete('/pets/:id', async(req,res)=>{
 })
 
 
+// edit feature data
+app.patch('/pets/:id', async(req,res)=>{
+  const id = req.params.id;
+  const query={_id: new ObjectId(id)};
+  const updatedData=req.body;
+  const result =await petCollection.updateOne(query, {$set: updatedData})
+  console.log(result);
+  res.send(result)
+})
+
+// get single data
+app.get('/pets/:id', async(req,res)=>{
+  const id = req.params.id
+  const  query = {_id: new ObjectId(id)}
+  const result = await petCollection.findOne(query);
+  res.send(result)
+})
 
 
+// user data
+app.put('/user/:email', async(req,res)=>{
+  const email= req.params.email;
+  const user =req.body;
+  console.log({user})
+  const filter = {email: email};
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      email : user.email,
+      photo: user.photoURL,
+      name : user.displayName,
+    },
+  };
+  const result = await userCollection.updateOne(filter, updateDoc, options);
+  res.send(result)
+})
+
+// get update user data
+app.get('/user/update/:id', async(req,res)=>{
+  const id = req.params.id;
+  const result = await userCollection.findOne({_id: new ObjectId(id)})
+  res.send(result)
+})
+
+// get user data
+
+app.get('/user/:email', async(req,res)=>{
+  const email = req.params.email;
+  const result = await userCollection.findOne({email})
+  res.send(result)
+})
 
 
+// patch updated data
+app.patch('/user/:email', async(req,res)=>{
+  const email = req.params.email;
+  const userData= req.body;
+  
 
-
-
-
+  const result = await userCollection.updateOne({email}, {$set: userData}, {upsert:true});
+  res.send(result)
+    
+})
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
