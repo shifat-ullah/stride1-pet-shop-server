@@ -29,13 +29,13 @@ function createToken(user) {
 function verifyToken(req, res, next) {
   const token = req.headers.authorization.split(' ')[1];
   const verify = jwt.verify(token, 'secret')
-  if(!verify?.email){
+  if (!verify?.email) {
     return res.send('You are not authorize')
   }
-  req.user= verify.email
+  req.user = verify.email
 
 
-    next();
+  next();
 
 }
 const uri = "mongodb+srv://pet-shop:e9v17hefgi1dlsJC@cluster0.nxcosv7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -59,7 +59,7 @@ async function run() {
     const userCollection = client.db('petShop').collection('users')
 
     // post featured data
-    app.post('/pets',verifyToken, async (req, res) => {
+    app.post('/pets', verifyToken, async (req, res) => {
       const formData = req.body;
       const result = await petCollection.insertOne(formData)
       // console.log(result);
@@ -88,44 +88,8 @@ async function run() {
 
     });
 
-
-    // get feature data
-    app.get('/pets', async (req, res) => {
-      const result = await petCollection.find().toArray();
-      res.send(result)
-    })
-
-    // feature delete
-    app.delete('/pets/:id',verifyToken, async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await petCollection.deleteOne(query);
-      res.send(result)
-    })
-
-
-    // edit feature data
-    app.patch('/pets/:id', verifyToken, async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const updatedData = req.body;
-      const result = await petCollection.updateOne(query, { $set: updatedData })
-      console.log(result);
-      res.send(result)
-    })
-
-    // get single data
-    app.get('/pets/:id', async (req, res) => {
-      const id = req.params.id
-      const query = { _id: new ObjectId(id) }
-      const result = await petCollection.findOne(query);
-      res.send(result)
-    })
-
-
-
     // user data
-    app.put('/user/:email',  async (req, res) => {
+    app.put('/user/:email', async (req, res) => {
       const email = req.params.email;
       const user = req.body;
       const token = createToken(user);
@@ -143,8 +107,52 @@ async function run() {
       return res.send({ result, token })
     })
 
+    // get feature data
+    app.get('/pets', async (req, res) => {
+      const result = await petCollection.find().toArray();
+      res.send(result)
+    })
+
+    // get single data
+    app.get('/pets/single/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await petCollection.findOne(query);
+      res.send(result)
+    })
+
+    // get details
+
+    app.get('/pets/details/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await petCollection.findOne(query);
+      res.send(result)
+    })
+
+    // edit feature data
+    app.patch('/pets/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedData = req.body;
+      const result = await petCollection.updateOne(query, { $set: updatedData })
+      console.log(result);
+      res.send(result)
+    })
+
+    // feature delete
+    app.delete('/pets/:id', verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await petCollection.deleteOne(query);
+      res.send(result)
+    })
+
+
+
+
     // get update user data
-    app.get('/user/update/:id',   async (req, res) => {
+    app.get('/user/update/:id', async (req, res) => {
       const id = req.params.id;
       const result = await userCollection.findOne({ _id: new ObjectId(id) })
       res.send(result)
@@ -160,7 +168,7 @@ async function run() {
 
 
     // patch updated data
-    app.patch('/user/:email', verifyToken,  async (req, res) => {
+    app.patch('/user/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       const userData = req.body;
 
@@ -172,14 +180,7 @@ async function run() {
 
 
 
-// get details
 
-app.get('/pets/details/:id', async(req,res)=>{
-  const id =req.params.id;
-  const query = {_id: new ObjectId(id)}
-  const result = await petCollection.findOne(query);
-  res.send(result)
-})
 
 
 
